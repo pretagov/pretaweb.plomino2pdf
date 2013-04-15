@@ -1,0 +1,4 @@
+<layers>
+    <layer name="pretaweb.plomino2pdf"
+        interface="pretaweb.plomino2pdf.browser.interfaces.IPlomino2Pdf" />
+</layers>
