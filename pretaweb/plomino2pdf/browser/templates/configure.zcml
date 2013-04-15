@@ -1,0 +1,12 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="pretaweb.plomino2pdf">
+
+    <browser:page 
+        for="*"
+        name="plomino_pdf_view"
+        class=".pdf_view.PdfView"
+        permission="zope2.View" />  
+
+</configure>

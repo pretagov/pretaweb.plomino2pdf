@@ -1,0 +1,16 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    i18n_domain="pretaweb.plomino2pdf">
+
+  <include package="Products.GenericSetup" file="meta.zcml" />
+  <genericsetup:registerProfile
+      name="default"
+      title="pretaweb.plomino2pdf default"
+      directory="profiles/default"
+      description="Extension profile for Plomino Plugin for rendering PDF documents."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+</configure>
