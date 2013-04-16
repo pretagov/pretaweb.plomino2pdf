@@ -3,14 +3,20 @@ from DateTime import DateTime
 from StringIO import StringIO
 from urllib import unquote
 
+from zope.component import getAdapters
+from ZPublisher.HTTPResponse import HTTPResponse
+
 from plone.memoize import view
 from plone.subrequest import subrequest
+from plone.transformchain.interfaces import ITransform
 from Products.Five import BrowserView
 from Products.CMFCore.utils import getToolByName
 
-from lxml.html import fromstring, tostring
 from lxml import etree
 from xhtml2pdf.document import pisaDocument
+
+def sort_key(a, b):
+    return cmp(a.order, b.order)
 
 class PdfView(BrowserView):
 
@@ -48,24 +54,13 @@ class PdfView(BrowserView):
                 return data_uri
             return uri
 
-        #import pdb;pdb.set_trace()
-        tree = fromstring(self.context.OpenDocument().encode(charset))
-        # find the content section
-        content = tree.xpath('//div[@id="content"]')
-        # create an empty lxml document
-        new_doc = etree.Element('html')
-        head = etree.SubElement(new_doc, 'head')
-        body = etree.SubElement(new_doc, 'body')
-        head = tree[0]
-        if len(content) < 1:
-            # XXX Do something more sensible
-            pass
-        body.append(content[0])
-        html = etree.tostring(new_doc)
-        #return etree.tostring(new_doc)
-        #return tostring(tree)
-        #return self.context.OpenDocument().encode(charset)
-        #html = StringIO(self.context.OpenDocument().encode(charset))
+        published = self.request.get('PUBLISHED', None)
+        handlers = [v[1] for v in getAdapters((published, self.request,), ITransform)]
+        handlers.sort(sort_key)
+        theme_handler = handlers[0]
+        html = self.context.OpenDocument()
+        html = theme_handler.transformIterable([html], charset)
+        html = etree.tostring(html.tree)
         pisadoc = pisaDocument(html, pdf, raise_exception=True, link_callback=fetch_resources)
         # pisadoc = pisaDocument(html, pdf, raise_exception=True)
         assert pdf.len != 0, 'Pisa PDF generation returned empty PDF!'
