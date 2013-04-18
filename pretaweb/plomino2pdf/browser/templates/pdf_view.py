@@ -57,6 +57,8 @@ class PdfView(BrowserView):
         published = self.request.get('PUBLISHED', None)
         handlers = [v[1] for v in getAdapters((published, self.request,), ITransform)]
         handlers.sort(sort_key)
+
+        # HACK: why are you just getting the first handler? Why not use all of them?
         theme_handler = handlers[0]
         html = self.context.OpenDocument()
         html = theme_handler.transformIterable([html], charset)
@@ -69,6 +71,7 @@ class PdfView(BrowserView):
         pdf.close()
 
         now = DateTime()
+        # HACK: We need to get a proper filename from somewhere
         filename = 'certificate'
         nice_filename = '%s_%s' % (filename, now.strftime('%Y%m%d'))
 
