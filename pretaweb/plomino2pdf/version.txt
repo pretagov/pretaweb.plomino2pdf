@@ -1,1 +1,1 @@
-0.1.0 (GIT/Unreleased)
+0.1.0
