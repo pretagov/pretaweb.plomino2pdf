@@ -58,12 +58,16 @@ class PdfView(BrowserView):
         handlers = [v[1] for v in getAdapters((published, self.request,), ITransform)]
         handlers.sort(sort_key)
 
-        # TODO: why are you just getting the first handler? Why not use all of them?
+        # The first handler is the diazo transform, the other 4 handlers are caching
         theme_handler = handlers[0]
         html = self.context.OpenDocument()
-        html = theme_handler.transformIterable([html], charset)
-        html = etree.tostring(html.tree)
-        pisadoc = pisaDocument(html, pdf, raise_exception=True, link_callback=fetch_resources)
+        new_html = theme_handler.transformIterable([html], charset)
+        # If the theme is not enabled, transform returns None
+        if new_html is not None:
+            new_html = etree.tostring(new_html.tree)
+        else:
+            new_html = html
+        pisadoc = pisaDocument(new_html, pdf, raise_exception=True, link_callback=fetch_resources)
         # pisadoc = pisaDocument(html, pdf, raise_exception=True)
         assert pdf.len != 0, 'Pisa PDF generation returned empty PDF!'
         #html.close()
