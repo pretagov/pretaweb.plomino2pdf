@@ -36,6 +36,8 @@ class PdfView(BrowserView):
             urltool = getToolByName(self.context, "portal_url")
             portal = urltool.getPortalObject()
             base = portal.absolute_url()
+            if uri.startswith('/'):
+                uri = base + uri
             if uri.startswith(base):
                 response = subrequest(unquote(uri[len(base)+1:]))
                 if response.status != 200:
@@ -52,6 +54,8 @@ class PdfView(BrowserView):
                 data = data.encode("base64").replace("\n", "")
                 data_uri = 'data:{0};base64,{1}'.format(ctype, data)
                 return data_uri
+            else:
+                uri
             return uri
 
         published = self.request.get('PUBLISHED', None)
