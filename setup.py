@@ -28,6 +28,7 @@ setup(name='pretaweb.plomino2pdf',
           # -*- Extra requirements: -*-
           'plone',
           'xhtml2pdf',
+          'pyPdf',
       ],
       extras_require = {
       'test': [
