@@ -4,6 +4,8 @@ from StringIO import StringIO
 from urllib import unquote
 
 from zope.component import getAdapters
+from zope.interface import implements
+from zope.interface import implementer
 from ZPublisher.HTTPResponse import HTTPResponse
 
 from plone.memoize import view
@@ -14,14 +16,34 @@ from Products.CMFCore.utils import getToolByName
 
 from lxml import etree
 from xhtml2pdf.document import pisaDocument
+from zope.publisher.interfaces import IPublishTraverse
+
 
 def sort_key(a, b):
     return cmp(a.order, b.order)
 
+@implementer(IPublishTraverse)
 class PdfView(BrowserView):
+
+    filename = None
+
+    def __init__(self, context, request):
+        """ Once we get to __call__, the path is lost so we
+        capture it here on initialization
+        """
+        super(PdfView, self).__init__(context, request)
+        #self.filename = request.path[-1]
+        # subpath seems to screw up pisa
+        self.filename = self.request.get('filename', None)
 
     def __call__(self):
         return self.print_to_pdf()
+
+    def publishTraverse(self, request, name):
+
+        self.traverse_subpath = self.request['TraversalRequestNameStack'] + [name]
+        self.request['TraversalRequestNameStack'] = []
+        return self
 
     def print_to_pdf(self):
         pdf = StringIO()
@@ -76,11 +98,16 @@ class PdfView(BrowserView):
 
         now = DateTime()
         # TODO: We need to get a proper filename from somewhere
-        filename = 'certificate'
-        nice_filename = '%s_%s' % (filename, now.strftime('%Y%m%d'))
+        if not self.filename:
+            filename = 'printed'
+            nice_filename = '%s_%s.pdf' % (filename, now.strftime('%Y%m%d'))
+        else:
+            nice_filename = self.filename
+            if nice_filename[-4:] != '.pdf':
+                nice_filename += '.pdf'
 
         self.request.response.setHeader("Content-Disposition",
-                                        "attachment; filename=%s.pdf" %
+                                        "attachment; filename=%s" %
                                         nice_filename)
         self.request.response.setHeader("Content-Type", "application/pdf")
         self.request.response.setHeader("Content-Length", len(pdfcontent))
