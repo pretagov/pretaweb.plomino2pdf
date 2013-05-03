@@ -2,6 +2,7 @@ from Acquisition import aq_parent
 from DateTime import DateTime
 from StringIO import StringIO
 from urllib import unquote
+import urlparse
 
 from zope.component import getAdapters
 from zope.interface import implements
@@ -58,6 +59,8 @@ class PdfView(BrowserView):
             urltool = getToolByName(self.context, "portal_url")
             portal = urltool.getPortalObject()
             base = portal.absolute_url()
+            import pdb; pdb.set_trace()
+            uri = urlparse.urljoin(rel, uri)
             if uri.startswith(base):
                 uri = uri[len(base)+1:]
             response = subrequest(unquote(uri))
@@ -67,10 +70,14 @@ class PdfView(BrowserView):
                 # stupid pisa doesn't let me send charset.
                 ctype,encoding = response.getHeader('content-type').split('charset=')
                 ctype = ctype.split(';')[0]
-                # pisa only likes ascii css
-                data = response.getBody().decode(encoding).encode('ascii',errors='ignore')
             except ValueError:
                 ctype = response.getHeader('content-type').split(';')[0]
+                encoding = 'utf8'
+
+            if ctype == 'text/css':
+                # pisa only likes ascii css
+                data = response.getBody().decode(encoding).encode('ascii',errors='ignore')
+            else:
                 data = response.getBody()
             data = data.encode("base64").replace("\n", "")
             data_uri = 'data:{0};base64,{1}'.format(ctype, data)
@@ -89,7 +96,8 @@ class PdfView(BrowserView):
             new_html = etree.tostring(new_html.tree)
         else:
             new_html = html
-        pisadoc = pisaDocument(new_html, pdf, raise_exception=True, link_callback=fetch_resources)
+        pisadoc = pisaDocument(new_html, pdf, path=self.context.absolute_url(),
+                               raise_exception=True, link_callback=fetch_resources)
         # pisadoc = pisaDocument(html, pdf, raise_exception=True)
         assert pdf.len != 0, 'Pisa PDF generation returned empty PDF!'
         #html.close()
