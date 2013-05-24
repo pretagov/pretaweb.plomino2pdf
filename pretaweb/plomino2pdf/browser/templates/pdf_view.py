@@ -59,7 +59,6 @@ class PdfView(BrowserView):
             urltool = getToolByName(self.context, "portal_url")
             portal = urltool.getPortalObject()
             base = portal.absolute_url()
-            import pdb; pdb.set_trace()
             uri = urlparse.urljoin(rel, uri)
             if uri.startswith(base):
                 uri = uri[len(base)+1:]
