@@ -88,7 +88,7 @@ class PdfView(BrowserView):
 
         # The first handler is the diazo transform, the other 4 handlers are caching
         theme_handler = handlers[0]
-        html = self.context.OpenDocument()
+        html = self.context.checkBeforeOpenDocument()
         new_html = theme_handler.transformIterable([html], charset)
         # If the theme is not enabled, transform returns None
         if new_html is not None:
