@@ -82,14 +82,15 @@ class PdfView(BrowserView):
             data_uri = 'data:{0};base64,{1}'.format(ctype, data)
             return data_uri
 
+        html = self.context.checkBeforeOpenDocument()
+        new_html = None
         published = self.request.get('PUBLISHED', None)
         handlers = [v[1] for v in getAdapters((published, self.request,), ITransform)]
         handlers.sort(sort_key)
-
-        # The first handler is the diazo transform, the other 4 handlers are caching
-        theme_handler = handlers[0]
-        html = self.context.checkBeforeOpenDocument()
-        new_html = theme_handler.transformIterable([html], charset)
+        if handlers:
+            # The first handler is the diazo transform, the other 4 handlers are caching
+            theme_handler = handlers[0]
+            new_html = theme_handler.transformIterable([html], charset)
         # If the theme is not enabled, transform returns None
         if new_html is not None:
             new_html = etree.tostring(new_html.tree)
