@@ -82,7 +82,11 @@ class PdfView(BrowserView):
             data_uri = 'data:{0};base64,{1}'.format(ctype, data)
             return data_uri
 
-        html = self.context.checkBeforeOpenDocument()
+        meta_type = self.context.meta_type
+        if meta_type == 'PlominoView':
+            html = self.context.checkBeforeOpenView()
+        else:
+            html = self.context.checkBeforeOpenDocument()
         new_html = None
         published = self.request.get('PUBLISHED', None)
         handlers = [v[1] for v in getAdapters((published, self.request,), ITransform)]
