@@ -75,7 +75,9 @@ class PdfView(BrowserView):
 
             if ctype == 'text/css':
                 # pisa only likes ascii css
-                data = response.getBody().decode(encoding).encode('ascii',errors='ignore')
+                # in order to backward compatible old version, don't put keywords
+                # encode in version 2.7: Support for keyword arguments added
+                data = response.getBody().decode(encoding).encode('ascii', 'ignore')
             else:
                 data = response.getBody()
             data = data.encode("base64").replace("\n", "")
