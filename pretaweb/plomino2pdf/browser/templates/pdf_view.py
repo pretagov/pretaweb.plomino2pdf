@@ -63,6 +63,9 @@ class PdfView(BrowserView):
             if uri.startswith(base):
                 uri = uri[len(base)+1:]
             response = subrequest(unquote(uri))
+            if response.status == 301:
+                new_uri = response.headers['location']
+                response = subrequest(unquote(new_uri))
             if response.status != 200:
                 return None
             try:
