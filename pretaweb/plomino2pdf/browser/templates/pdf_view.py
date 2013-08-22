@@ -90,8 +90,12 @@ class PdfView(BrowserView):
         meta_type = self.context.meta_type
         if meta_type == 'PlominoView':
             html = self.context.checkBeforeOpenView()
-        else:
+        elif meta_type == 'PlominoDocument':
             html = self.context.checkBeforeOpenDocument()
+        elif meta_type == 'PlominoForm':
+            html = self.context.OpenForm(searchresults=[])
+        else:
+            html = getattr(self.context, self.context.default_view)()
         new_html = None
         published = self.request.get('PUBLISHED', None)
         handlers = [v[1] for v in getAdapters((published, self.request,), ITransform)]
