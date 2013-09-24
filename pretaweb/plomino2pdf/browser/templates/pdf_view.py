@@ -18,7 +18,7 @@ from Products.CMFCore.utils import getToolByName
 from lxml import etree
 from xhtml2pdf.document import pisaDocument
 from zope.publisher.interfaces import IPublishTraverse
-
+from zope.contenttype import guess_content_type, text_type
 
 def sort_key(a, b):
     return cmp(a.order, b.order)
@@ -68,13 +68,23 @@ class PdfView(BrowserView):
                 response = subrequest(unquote(new_uri))
             if response.status != 200:
                 return None
-            try:
-                # stupid pisa doesn't let me send charset.
-                ctype,encoding = response.getHeader('content-type').split('charset=')
-                ctype = ctype.split(';')[0]
-            except ValueError:
-                ctype = response.getHeader('content-type').split(';')[0]
-                encoding = 'utf8'
+
+            content_type = response.getHeader('content-type')
+            if content_type:
+                try:
+                    # stupid pisa doesn't let me send charset.
+                    ctype, encoding = response.getHeader('content-type').split('charset=')
+                    ctype = ctype.split(';')[0]
+                except ValueError:
+                    ctype = response.getHeader('content-type').split(';')[0]
+                    encoding = 'utf8'
+            else:
+                # content-type in headers could be empty,
+                # we need to use guess_content_type and text_type
+                # to guess the content-type
+                ctype, encoding = guess_content_type(uri)
+                if ctype and ctype.startswith('text/'):
+                    ctype = text_type(uri)
 
             if ctype == 'text/css':
                 # pisa only likes ascii css
