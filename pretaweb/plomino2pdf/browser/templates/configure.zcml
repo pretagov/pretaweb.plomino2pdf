@@ -9,4 +9,16 @@
         class=".pdf_view.PdfView"
         permission="zope2.View" />  
 
+    <browser:page
+        for="*"
+        name="plomino_pdf_api"
+        class=".pdf_view.PdfApi"
+        permission="zope2.View" />
+
+    <browser:page
+        for="*"
+        name="email_pdf"
+        class=".email_pdf.EmailPdf"
+        permission="zope2.View" />
+
 </configure>

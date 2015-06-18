@@ -23,30 +23,13 @@ from zope.contenttype import guess_content_type, text_type
 def sort_key(a, b):
     return cmp(a.order, b.order)
 
-@implementer(IPublishTraverse)
-class PdfView(BrowserView):
 
-    filename = None
-
-    def __init__(self, context, request):
-        """ Once we get to __call__, the path is lost so we
-        capture it here on initialization
-        """
-        super(PdfView, self).__init__(context, request)
-        #self.filename = request.path[-1]
-        # subpath seems to screw up pisa
-        self.filename = self.request.get('filename', None)
+class PdfApi(BrowserView):
 
     def __call__(self):
-        return self.print_to_pdf()
-
-    def publishTraverse(self, request, name):
-
-        self.traverse_subpath = self.request['TraversalRequestNameStack'] + [name]
-        self.request['TraversalRequestNameStack'] = []
         return self
 
-    def print_to_pdf(self):
+    def generate_pdf(self):
         pdf = StringIO()
         charset = self.context.portal_properties.site_properties.default_charset
 
@@ -126,6 +109,35 @@ class PdfView(BrowserView):
         #html.close()
         pdfcontent = pdf.getvalue()
         pdf.close()
+        return pdfcontent
+
+
+@implementer(IPublishTraverse)
+class PdfView(BrowserView):
+
+    filename = None
+
+    def __init__(self, context, request):
+        """ Once we get to __call__, the path is lost so we
+        capture it here on initialization
+        """
+        super(PdfView, self).__init__(context, request)
+        #self.filename = request.path[-1]
+        # subpath seems to screw up pisa
+        self.filename = self.request.get('filename', None)
+
+    def __call__(self):
+        return self.print_to_pdf()
+
+    def publishTraverse(self, request, name):
+
+        self.traverse_subpath = self.request['TraversalRequestNameStack'] + [name]
+        self.request['TraversalRequestNameStack'] = []
+        return self
+
+    def print_to_pdf(self):
+        pdf_api = self.context.restrictedTraverse('plomino_pdf_api')
+        pdfcontent = pdf_api.generate_pdf()
 
         now = DateTime()
         # TODO: We need to get a proper filename from somewhere
