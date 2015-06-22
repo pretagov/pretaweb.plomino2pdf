@@ -6,6 +6,7 @@ from plone.directives import form
 from plone.supermodel import model
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from pretaweb.plomino2pdf import _
+from pretaweb.plomino2pdf import api as pdf_api
 from zope import schema
 from z3c.form import field, button
 
@@ -41,8 +42,7 @@ class EmailPdf(form.SchemaForm):
             self.status = self.formErrorsMessage
 
     def attach_pdf_from_context(self):
-        pdf_api = self.context.restrictedTraverse('plomino_pdf_api')
-        pdf_mime = MIMEApplication(pdf_api.generate_pdf())
+        pdf_mime = MIMEApplication(pdf_api.generate_pdf(self.context))
         pdf_mime.add_header(
             'Content-Disposition','attachment',
             filename='plomino.pdf'

@@ -3,16 +3,10 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="pretaweb.plomino2pdf">
 
-    <browser:page 
+    <browser:page
         for="*"
         name="plomino_pdf_view"
         class=".pdf_view.PdfView"
-        permission="zope2.View" />  
-
-    <browser:page
-        for="*"
-        name="plomino_pdf_api"
-        class=".pdf_view.PdfApi"
         permission="zope2.View" />
 
     <browser:page
