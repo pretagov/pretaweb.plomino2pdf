@@ -15,54 +15,28 @@ from zope.component import getAdapters
 from zope.contenttype import guess_content_type, text_type
 import urlparse
 import logging
-logger=logging.getLogger('preteweb.plomino2pdf.api')
+logger=logging.getLogger('pretaweb.plomino2pdf.api')
 
 def sort_key(a, b):
     return cmp(a.order, b.order)
 
-def email_form_as_pdf(form,recipient,subject=None,content=None):
-    """ Builds a PDF of the submitted form and emails it to the recipient """
+def generate_pdf(url,context):
+    """ Builds a PDF of the passed in url """
     # Get the html with values
     portal = api.portal.get()
-    request = getattr(form,"REQUEST",None)
+    request = getattr(context,"REQUEST",None)
 
-    # Use the custom view DisplayForm to render the form from the request
-    displayform = subrequest('./DisplayForm')
+    # Use subrequest to access the passed in url
+    page = subrequest(url,root=context)
 
     # Transform the html
-    html=transform_html(displayform.getBody(),request)
+    html = transform_html(page.getBody(),request)
 
     # Generate the pdf
-    pdf = generate_pdf(html,form.absolute_url(),request)
-    pdf_name=form.getId()
+    pdf = build_pdf(html,context.absolute_url(),request)
 
-    # Create an email
-    message = MIMEMultipart()
-    if subject is None:
-        subject='%s PDF Attached' % form.title
-    message['Subject'] = subject
-    message['From'] = '%s <%s>' % (portal.getProperty('email_from_name'),
-                                   portal.getProperty('email_from_address'))
-    message['To'] = recipient
-    if content is None:
-        content = 'Attached PDF %s.pdf' % pdf_name
-    message_content = MIMEText('%s\n' % content)
-    message.attach(message_content)
-
-    # Attach the pdf
-    pdf_mime = MIMEApplication(pdf)
-    pdf_mime.add_header(
-        'Content-Disposition','attachment',
-        filename='%s.pdf' % pdf_name
-    )
-    message.attach(pdf_mime)
-
-    # Send the email
-    send_mime_message(message)
-
-def send_mime_message(message):
-    mh = api.portal.get_tool('MailHost')
-    return mh.send(message, immediate=True)
+    # Return the generated pdf
+    return pdf
 
 def transform_html(html,request):
     portal = api.portal.get()
@@ -82,7 +56,7 @@ def transform_html(html,request):
         new_html = html
     return new_html
 
-def generate_pdf(html,path,request):
+def build_pdf(html,path,request):
 
     def fetch_resources(uri, rel):
         """
@@ -134,8 +108,10 @@ def generate_pdf(html,path,request):
     pdf = StringIO()
 
     pisadoc = pisaDocument(html,pdf, path=path,
-                           raise_exception=True, link_callback=fetch_resources)
-    # pisadoc = pisaDocument(html, pdf, raise_exception=True)
+                           raise_exception=True)
+                           # FIXME: Disabled due to PageForm issues
+                           #, link_callback=fetch_resources)
+
     assert pdf.len != 0, 'Pisa PDF generation returned empty PDF!'
 
     pdf_content = pdf.getvalue()
