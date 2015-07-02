@@ -9,16 +9,4 @@
         class=".pdf_view.PdfView"
         permission="zope2.View" />
 
-    <browser:page
-        for="*"
-        name="email_pdf"
-        class=".email_pdf.EmailPdf"
-        permission="zope2.View" />
-
-    <browser:page
-        for="*"
-        name="DisplayForm"
-        template="DisplayForm.pt"
-        permission="zope2.View" />
-
 </configure>
