@@ -22,6 +22,10 @@ Include ``pretaweb.plomino2pdf`` in the ``eggs`` section of your buildout::
 
 Examples::
 
-    # Email a form as a pdf
-    from pretaweb.plomino2pdf.api import email_form_as_pdf
-    email_form_as_pdf(plominoContext,'test@example.com')
+Generate a pdf:
+
+    from pretaweb.plomino2pdf.api import generate_pdf
+    pdf = generate_pdf('some_url',some_context)
+
+This will generate a pdf using plone.subrequest. 'some_url' should be relative
+to the url of some_context.
