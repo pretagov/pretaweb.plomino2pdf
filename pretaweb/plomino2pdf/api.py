@@ -102,9 +102,7 @@ def build_pdf(html,path,request):
     pdf = StringIO()
 
     pisadoc = pisaDocument(html,pdf, path=path,
-                           raise_exception=True)
-                           # FIXME: Disabled due to PageForm issues
-                           #, link_callback=fetch_resources)
+                           raise_exception=True, link_callback=fetch_resources)
 
     assert pdf.len != 0, 'Pisa PDF generation returned empty PDF!'
 
