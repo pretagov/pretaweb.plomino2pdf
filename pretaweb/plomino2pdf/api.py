@@ -7,6 +7,7 @@ from urllib import unquote
 from xhtml2pdf.document import pisaDocument
 from zope.component import getAdapters
 from zope.contenttype import guess_content_type, text_type
+import re
 import urlparse
 import logging
 logger=logging.getLogger('pretaweb.plomino2pdf.api')
@@ -95,7 +96,11 @@ def build_pdf(html,path,request):
             data = response.getBody().decode(encoding).encode('ascii', 'ignore')
         else:
             data = response.getBody()
-        data = data.encode("base64").replace("\n", "")
+        data = data.replace("\n","")
+        fontre = re.compile('.*format\(\'woff\'\).*')
+        if fontre.match(data):
+            return 'data:text/css;base64,'
+        data = data.encode("base64")
         data_uri = 'data:{0};base64,{1}'.format(ctype, data)
         return data_uri
 
