@@ -97,8 +97,7 @@ def build_pdf(html,path,request):
         else:
             data = response.getBody()
         data = data.replace("\n","")
-        fontre = re.compile('.*format\(\'woff\'\).*')
-        if fontre.match(data):
+        if 'PDF-EXCLUDE' in data:
             return 'data:text/css;base64,'
         data = data.encode("base64")
         data_uri = 'data:{0};base64,{1}'.format(ctype, data)
