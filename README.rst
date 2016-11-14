@@ -11,6 +11,15 @@ Introduction
 This package contains a number of functions for generating PDF documents from
 plomino.
 
+Dependencies
+============
+
+You should install the dependencies required by weasyprint.
+
+http://weasyprint.readthedocs.io/en/latest/install.html
+
+On a Ubuntu system and when using Ubuntu you should install ``libcffi-dev``.
+
 Installation
 ============
 
