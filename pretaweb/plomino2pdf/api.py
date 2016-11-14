@@ -31,7 +31,6 @@ def my_fetcher(url):
 
     # Use the default URL fetcher for CSS files
     if url.endswith('.css'):
-        print url
         return default_url_fetcher(url)
 
     uri = url
