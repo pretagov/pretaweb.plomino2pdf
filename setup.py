@@ -26,8 +26,9 @@ setup(name='pretaweb.plomino2pdf',
       install_requires=[
           'setuptools',
           # -*- Extra requirements: -*-
-          'xhtml2pdf',
-          'pyPdf',
+#          'xhtml2pdf',
+          'weasyprint',
+#          'pyPdf',
       ],
       extras_require = {
       'test': [
