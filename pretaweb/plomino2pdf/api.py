@@ -4,16 +4,12 @@ from plone.subrequest import subrequest
 from plone.transformchain.interfaces import ITransform
 from StringIO import StringIO
 from urllib import unquote
-#from xhtml2pdf.document import pisaDocument
 from zope.component import getAdapters
 from zope.contenttype import guess_content_type, text_type
-import re
-import urlparse
 import logging
 
 logger = logging.getLogger('pretaweb.plomino2pdf.api')
 
-from weasyprint import default_url_fetcher
 from weasyprint import HTML
 
 
@@ -22,42 +18,38 @@ def sort_key(a, b):
 
 
 def my_fetcher(url):
-    # Ignore certain resources
-    if 'googleapis' in url:
-        raise Exception('Not loading Google resources')
-
-    if '++plone++production' in url:
-        raise Exception('Not loading bundle resources')
-
-    # Use the default URL fetcher for CSS files
-    if url.endswith('.css'):
-        return default_url_fetcher(url)
-
     uri = url
     # Otherwise fetch the data
     response = subrequest(unquote(uri))
 
+    # Handle redirects
     if response.status == 301:
-        uri = response.headers['location']
+        uri = response.getHeader('location')
         response = subrequest(unquote(uri))
 
     if response.status != 200:
         raise Exception("URI not found")
 
     content_type = response.getHeader('content-type')
-    if not content_type:
-        content_type = guess_content_type(uri)[0]
-        if content_type and content_type.startswith('text/'):
-            content_type = text_type(uri)
+    # Default encoding
+    encoding = 'utf-8'
+
+    if content_type:
+        if ';' in content_type:
+            ctype, encoding = content_type.split(';')
+            encoding = encoding.split('charset=')[-1]
+        else:
+            ctype = content_type
+    # Guess the content_type from the URI if needed
+    else:
+        ctype, encoding = guess_content_type(uri)
+        if ctype and ctype.startswith('text/'):
+            ctype = text_type(uri)
 
     data = response.getBody()
-    return dict(string=data)
-    # data = data.replace("\n", "")
-    # if 'PDF-EXCLUDE' in data:
-    #     return 'data:text/css;base64,'
-    # data = data.encode('base64')
-    # data_uri = 'data:{0};base64,{1}'.format(content_type, data)
-    # return dict(string=data_uri)
+
+    # I don't think we need to encode ctype == 'text/css' to ascii anymore
+    return dict(string=data, mime_type=ctype, encoding=encoding)
 
 
 def generate_pdf(url, context):
