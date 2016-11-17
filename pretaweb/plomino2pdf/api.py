@@ -52,13 +52,20 @@ def my_fetcher(url):
     return dict(string=data, mime_type=ctype, encoding=encoding)
 
 
-def generate_pdf(url, context):
-    """ Builds a PDF of the passed in url """
+def generate_pdf(url, context, ignore_context=False):
+    """
+    Builds a PDF of the passed in url.
+    The URL is fetched relative to the context, unless ignore_context is True
+    """
+
     request = getattr(context, "REQUEST", None)
     base_url = context.getParentDatabase().absolute_url()
 
     # Use subrequest to access the passed in url
-    page = subrequest(url, root=context)
+    if ignore_context:
+        page = subrequest(url)
+    else:
+        page = subrequest(url, root=context)
 
     # Transform the html
     # Have to set the content-type header to text/html before we can transform
