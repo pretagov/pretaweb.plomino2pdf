@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.2.0 unreleased
+----------------
+- Add an option to ignore the context when fetching the URL
+- Use subrequest for all resources
+- Replace xhtml2pdf with weasyprint
+
 0.1.0 Unreleased
 ----------------
 
