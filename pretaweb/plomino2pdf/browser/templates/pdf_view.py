@@ -29,7 +29,7 @@ class PdfView(BrowserView):
         return self
 
     def print_to_pdf(self):
-        pdfcontent = pdf_api.generate_pdf(self.context)
+        pdfcontent = pdf_api.generate_pdf(self.context.absolute_url(),self.context)
         now = DateTime()
         # TODO: We need to get a proper filename from somewhere
         if not self.filename:
