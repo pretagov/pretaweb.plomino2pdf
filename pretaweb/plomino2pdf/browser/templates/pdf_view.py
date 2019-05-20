@@ -44,9 +44,9 @@ class PdfView(BrowserView):
                                         "attachment; filename=%s" %
                                         nice_filename)
         self.request.response.setHeader("Content-Type", "application/pdf")
-        self.request.response.setHeader("Content-Length", len(pdfcontent))
+        self.request.response.setHeader("Content-Length", len(pdfcontent.getvalue()))
         self.request.response.setHeader('Last-Modified', DateTime.rfc822(DateTime()))
         self.request.response.setHeader("Cache-Control", "no-store")
         self.request.response.setHeader("Pragma", "no-cache")
-        self.request.response.write(pdfcontent)
+        self.request.response.write(pdfcontent.getvalue())
         return pdfcontent
