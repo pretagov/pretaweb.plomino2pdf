@@ -29,7 +29,7 @@ class PdfView(BrowserView):
         return self
 
     def print_to_pdf(self):
-        content_url = '/'.join(self.request.URL.split('/')[:-1])
+        content_url = '%s?%s' %('/'.join(self.request.URL.split('/')[:-1]),self.request["QUERY_STRING"])
         pdfcontent = pdf_api.generate_pdf(content_url,self.context)
         now = DateTime()
         # TODO: We need to get a proper filename from somewhere
