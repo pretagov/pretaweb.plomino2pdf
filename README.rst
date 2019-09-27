@@ -3,13 +3,14 @@
 pretaweb.plomino2pdf
 ====================
 
-Plomino PDF library.
+Plone PDF library.
 
 Introduction
 ============
 
-This package contains a number of functions for generating PDF documents from
-plomino.
+This package contains a number of functions for generating PDF documents inside plone.
+
+It's currently badly named. It has no dependency on Plomino.
 
 Dependencies
 ============
@@ -38,3 +39,12 @@ Generate a pdf:
 
 This will generate a pdf using plone.subrequest. 'some_url' should be relative
 to the url of some_context.
+
+There is also a view that allows any url to be downloaded as a PDF:
+
+    http://mysite/somepage/pdf_view
+
+or
+
+    http://mysite/somepage/pdf_view?filename=somepage.pdf
+
