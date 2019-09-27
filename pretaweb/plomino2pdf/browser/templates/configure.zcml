@@ -9,4 +9,10 @@
         class=".pdf_view.PdfView"
         permission="zope2.View" />
 
+    <browser:page
+        for="*"
+        name="pdf_view"
+        class=".pdf_view.PdfView"
+        permission="zope2.View" />
+
 </configure>
