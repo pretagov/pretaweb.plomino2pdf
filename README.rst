@@ -34,6 +34,8 @@ Examples::
 
 Generate a pdf:
 
+.. code-block:: python
+
     from pretaweb.plomino2pdf.api import generate_pdf
     pdf = generate_pdf('some_url',some_context)
 
@@ -42,9 +44,13 @@ to the url of some_context.
 
 There is also a view that allows any url to be downloaded as a PDF:
 
+.. code-block:: url
+
     http://mysite/somepage/pdf_view
 
 or
+
+.. code-block:: url
 
     http://mysite/somepage/pdf_view?filename=somepage.pdf
 
